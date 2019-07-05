@@ -1,11 +1,13 @@
-all: rotek-upgrade-package-extract
+all:  program
 
-rotek-upgrade-package-extract: main.o
-	gcc main.o -o rotek-upgrade-package-extract
+program: main.o
+	gcc obj/main.o -o bin/rotek-upgrade-package-extract
 
-main.o: main.c
-	gcc -c main.c
-
+main.o: src/main.c
+	gcc -c src/main.c -o obj/main.o
 
 clean:
-	rm -rf *.o rotek-upgrade-package-extract
+	rm -rf bin obj
+
+$(shell mkdir -p bin)
+$(shell mkdir -p obj)
