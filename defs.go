@@ -2,6 +2,10 @@ package main
 
 const BufferSize = 128
 
+const usage = "Usage: rotek-upgrade-package-extract [firmware-file-name]"
+const PathUnpacked = "unpacked"
+const firmware = "firmware.bin"
+
 type Footer struct {
 	SignatureSize [3]uint16
 	Signature     [3][]byte
@@ -33,6 +37,7 @@ type RotekHeader struct {
 type Rotek struct {
 	Header RotekHeader
 	Footer Footer
+	File   []Block
 }
 
 type Type int
