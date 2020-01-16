@@ -36,7 +36,7 @@ func (Footer *Footer) ReadFooter(file *os.File, name string) {
 			return
 		}
 	}
-	err := binary.Read(file, binary.LittleEndian, &Footer.Unused)
+	err := binary.Read(file, binary.LittleEndian, &Footer.Content)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -46,16 +46,16 @@ func (Footer *Footer) ReadFooter(file *os.File, name string) {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println("Unused", Footer.Unused)
+	fmt.Println("Content:", Footer.Content)
 }
 
 func main() {
-	if len(os.Args) < 2 {
-		fmt.Println(usage)
-		return
+	filename := firmware
+	if len(os.Args) > 1 {
+		filename = os.Args[1]
 	}
 
-	file, err := os.Open(os.Args[1])
+	file, err := os.Open(filename)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -76,19 +76,22 @@ func main() {
 	fmt.Println("vendor:", string(header.Header.Vendor[:n]))
 	n = bytes.IndexByte(header.Header.Device[:], 0)
 	fmt.Println("device", string(header.Header.Device[:n]), "hw", binary.BigEndian.Uint32(value))
-	v1, v2, v3, v4 := make([]byte, 2), make([]byte, 2), make([]byte, 2), make([]byte, 2)
+	v1, v2, v3, cnt := make([]byte, 2), make([]byte, 2), make([]byte, 4), make([]byte, 4)
 	binary.LittleEndian.PutUint16(v1, header.Header.V1)
 	binary.LittleEndian.PutUint16(v2, header.Header.V2)
-	binary.LittleEndian.PutUint16(v3, header.Header.V3)
-	binary.LittleEndian.PutUint16(v4, header.Header.V4)
-	fmt.Println("version ", binary.BigEndian.Uint16(v1), binary.BigEndian.Uint16(v2), binary.BigEndian.Uint16(v3), binary.BigEndian.Uint16(v4))
+	binary.LittleEndian.PutUint32(v3, header.Header.V3)
+	binary.LittleEndian.PutUint(cnt, header.Header.FileCount)
+
+	fmt.Println("version ", binary.BigEndian.Uint16(v1), binary.BigEndian.Uint16(v2), binary.BigEndian.Uint32(v3))
 	header.Footer.ReadFooter(file, firmware)
 
-	fmt.Println("Unk:", header.Header.Unk)
-	fmt.Println("Unk1:", header.Header.Unk1)
+	fmt.Println("Unka:", header.Header.Unka)
+	fmt.Println("Unkb:", header.Header.Unka)
+	fmt.Println("Unkc:", header.Header.Unka)
 	header.File = make([]Block, header.Header.FileCount)
+	fmt.Println("header.Header.FileCount:", binary.BigEndian.Uint32(cnt))
 
-	for i := byte(0); i < header.Header.FileCount; i++ {
+	for i := uint32(0); i < header.Header.FileCount; i++ {
 		err := binary.Read(file, binary.BigEndian, &header.File[i].Size)
 
 		if err != nil {

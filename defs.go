@@ -9,7 +9,7 @@ const firmware = "firmware.bin"
 type Footer struct {
 	SignatureSize [3]uint16
 	Signature     [3][]byte
-	Unused        uint16
+	Content       uint16
 	Sha1          [20]byte
 }
 
@@ -22,16 +22,17 @@ type Block struct {
 }
 
 type RotekHeader struct {
-	Vendor    [32]byte
-	Device    [32]byte
-	V1        uint16
-	V2        uint16
-	V3        uint16
-	V4        uint16
-	Unk       [12]byte
-	HwRev     uint32
-	FileCount byte
-	Unk1      [3]byte
+	Vendor     [32]byte
+	Device     [32]byte
+	V1         uint16
+	V2         uint16
+	V3         uint32
+	Unka       uint32
+	Unkb       uint32
+	Unkc       uint32
+	HwRev      uint32
+	FileCount  uint16
+	FileCount1 uint16
 }
 
 type Rotek struct {
